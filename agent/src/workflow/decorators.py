@@ -133,6 +133,8 @@ def send_test_case():
                         "response": agent_response,
                         "retrieved_contexts": "",
                         "created_at": datetime.now().isoformat(),
+                        "user_id": state.get("user_id"),
+                        "session_id": state.get("session_id"),
                     }
 
                     add_test_case(sheet, TestCase(**test_case))

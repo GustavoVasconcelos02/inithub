@@ -23,35 +23,50 @@ def get_test_cases_sheet():
     else:
         sheet = workbook.add_worksheet(new_worksheet_name, rows=10, cols=10)
 
-    titles = ["Modelo", "Usuário", "Agente", "Contextos", "Criado em"]
-    sheet.update("A1:E1", [titles])
-    sheet.format("A1:E1", {"textFormat": {"bold": True}})
+    titles = [
+        "Modelo",
+        "User ID",
+        "Session ID",
+        "Criado em",
+        "Usuário",
+        "Agente",
+        "Contextos",
+    ]
+
+    sheet.update("A1:G1", [titles])
+    sheet.format("A1:G1", {"textFormat": {"bold": True}})
 
     sheet.freeze(rows=1)
 
-    sheet.format("B:B", {"wrapStrategy": "WRAP"})
-    sheet.format("C:C", {"wrapStrategy": "WRAP"})
-    sheet.format("D:D", {"wrapStrategy": "WRAP"})
+    _apply_text_wrap(sheet, ["A:A", "B:B", "C:C", "D:D", "E:E", "F:F", "G:G"])
 
     sheet.format(
-        "A2:E1000",
+        "A1:G1000",
         {
+            "verticalAlignment": "TOP",
             "backgroundColorStyle": {
                 "rgbColor": {"red": 0.98, "green": 0.98, "blue": 0.98}
-            }
+            },
         },
     )
 
     return sheet
 
 
+def _apply_text_wrap(sheet: gspread.Worksheet, list_col_range: list[str]):
+    for col_range in list_col_range:
+        sheet.format(col_range, {"wrapStrategy": "WRAP"})
+
+
 def add_test_case(sheet: gspread.Worksheet, test_case: TestCase):
     sheet.append_row(
         [
-            test_case["model"],
-            test_case["user_input"],
-            test_case["response"],
-            str(test_case["retrieved_contexts"]),
-            test_case["created_at"],
+            test_case.get("model") or "unknown-model",
+            test_case.get("user_id") or "",
+            test_case.get("session_id") or "",
+            test_case.get("created_at") or "",
+            test_case.get("user_input") or "",
+            test_case.get("response") or "",
+            str(test_case.get("retrieved_contexts") or []),
         ]
     )

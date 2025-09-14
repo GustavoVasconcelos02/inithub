@@ -38,6 +38,8 @@ class State(TypedDict):
     messages: Annotated[list, add_messages]
     initiative: Initiative | None
     flow_type: str | None
+    user_id: str | None
+    session_id: str | None
 
 
 class TestCase(TypedDict):
@@ -46,3 +48,5 @@ class TestCase(TypedDict):
     response: str
     retrieved_contexts: list[str] | None
     created_at: str
+    user_id: str | None
+    session_id: str | None
