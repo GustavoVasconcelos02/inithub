@@ -12,7 +12,7 @@ PROMPTS_DIR = "prompts"
 
 @decorators.log_node
 @decorators.with_prompt()
-def classify_user_request(state: State, prompt_template=None):
+def classify_user_request_v1(state: State, prompt_template=None):
     classifier_llm = default_llm.with_structured_output(FlowClassifier)
     try:
         result = classifier_llm.invoke(
@@ -49,7 +49,7 @@ def route_user_request(state: State):
 @decorators.log_node
 @decorators.with_prompt()
 @decorators.send_test_case()
-def guide(state: State, prompt_template=None, add_comportamentals=True):
+def guide_v1(state: State, prompt_template=None, add_comportamentals=True):
     result = {
         "messages": default_llm.invoke(
             state["messages"]
@@ -67,7 +67,7 @@ def guide(state: State, prompt_template=None, add_comportamentals=True):
 @decorators.log_node
 @decorators.with_prompt()
 @decorators.send_test_case()
-def register_initiative(state: State, prompt_template=None):
+def register_initiative_v1(state: State, prompt_template=None):
     new_initiative = state.get("initiative") or {}
 
     prompt_content = (prompt_template or "").format(
@@ -94,7 +94,7 @@ def register_initiative(state: State, prompt_template=None):
 
 @decorators.log_node
 @decorators.with_prompt()
-def extract_initiative(state: State, prompt_template=None, add_comportamentals=True):
+def extract_initiative_v1(state: State, prompt_template=None, add_comportamentals=True):
     new_initiative = state.get("initiative") or Initiative(
         title=None, theme=None, context=None, deliverable=None, avaliation_criteria=None
     )
@@ -139,7 +139,7 @@ def extract_initiative(state: State, prompt_template=None, add_comportamentals=T
 @decorators.log_node
 @decorators.with_prompt()
 @decorators.send_test_case()
-def find_initiative(state: State, prompt_template=None, add_comportamentals=True):
+def find_initiative_v1(state: State, prompt_template=None, add_comportamentals=True):
     threshold = 0.75
     initiative = state.get("initiative")
 

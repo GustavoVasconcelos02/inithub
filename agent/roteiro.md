@@ -1,5 +1,4 @@
 ## Caminho Feliz (B3)
-
 User: Oi
 Agent: Olá, eu sou o Init Agent! Assistente especializado em captar ideias inovadoras, como posso estar te ajudando hoje?
 
@@ -89,5 +88,4 @@ User: Olá, estou procurando iniciativas relacionadas a melhoria do processo de 
 
 
 ## Frase de Boas Vindas
-
 Agent: Olá, eu sou o Init Agent! Assistente especializado em captar ideias inovadoras, como posso estar te ajudando hoje?
