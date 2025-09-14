@@ -4,5 +4,5 @@ up:
 build:
 	docker compose up -d --build
 
-up-agent:
+agent-run:
 	docker compose up --build agent

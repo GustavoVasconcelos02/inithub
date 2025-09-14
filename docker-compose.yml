@@ -30,7 +30,6 @@ services:
     env_file: "./.env"
     volumes:
       - ./agent:/app
-      - ./credentials.json:/app/credentials.json:ro
     networks:
       - init-hub-network
 

@@ -1,3 +1,4 @@
+from src.config import env
 from src.schemas.agent import State
 from src.schemas.agent import TestCase
 from src.services.google_sheets import get_test_cases_sheet, add_test_case
@@ -94,7 +95,10 @@ def send_test_case():
     def decorator(func):
         @wraps(func)
         def wrapper(state: State, *args, **kwargs):
-            user_input = ""
+            if not env.ENABLE_GOOGLE_SHEETS:
+                return func(state, *args, **kwargs)
+
+            user_input = "unknown-user-input"
             messages = state.get("messages", [])
             for msg in reversed(messages):
                 content = getattr(msg, "content", None) or (
