@@ -23,3 +23,5 @@ COLORLOG_AVAILABLE = os.getenv("COLORLOG_AVAILABLE", "true").lower() in (
     "1",
     "yes",
 )
+
+GOOGLE_SHEET_ID = os.getenv("GOOGLE_SHEET_ID", "")

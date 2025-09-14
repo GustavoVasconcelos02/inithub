@@ -38,3 +38,11 @@ class State(TypedDict):
     messages: Annotated[list, add_messages]
     initiative: Initiative | None
     flow_type: str | None
+
+
+class TestCase(TypedDict):
+    model: str
+    user_input: str
+    response: str
+    retrieved_contexts: list[str] | None
+    created_at: str

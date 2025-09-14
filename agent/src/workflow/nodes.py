@@ -1,5 +1,5 @@
-from src.services.backend import find_similar_embeddings
-from src.workflow.decorators import log_node, with_prompt
+from src.services import backend
+from src.workflow import decorators
 from src.schemas.agent import State, FlowClassifier, Initiative
 from src.llms import default_llm
 
@@ -12,8 +12,8 @@ import traceback
 PROMPTS_DIR = "prompts"
 
 
-@log_node
-@with_prompt()
+@decorators.log_node
+@decorators.with_prompt()
 def classify_user_request(state: State, prompt_template=None):
     classifier_llm = default_llm.with_structured_output(FlowClassifier)
     try:
@@ -36,7 +36,7 @@ def classify_user_request(state: State, prompt_template=None):
         return output
 
 
-@log_node
+@decorators.log_node
 def route_user_request(state: State):
     flow_type = state.get("flow_type", "direcionar")
 
@@ -48,8 +48,9 @@ def route_user_request(state: State):
     return {"next": "guide"}
 
 
-@log_node
-@with_prompt()
+@decorators.log_node
+@decorators.with_prompt()
+@decorators.send_test_case()
 def guide(state: State, prompt_template=None, add_comportamentals=True):
     result = {
         "messages": default_llm.invoke(
@@ -65,8 +66,9 @@ def guide(state: State, prompt_template=None, add_comportamentals=True):
     return result
 
 
-@log_node
-@with_prompt()
+@decorators.log_node
+@decorators.with_prompt()
+@decorators.send_test_case()
 def register_initiative(state: State, prompt_template=None):
     new_initiative = state.get("initiative") or {}
 
@@ -92,8 +94,8 @@ def register_initiative(state: State, prompt_template=None):
     return result
 
 
-@log_node
-@with_prompt()
+@decorators.log_node
+@decorators.with_prompt()
 def extract_initiative(state: State, prompt_template=None, add_comportamentals=True):
     new_initiative = state.get("initiative") or Initiative(
         title=None, theme=None, context=None, deliverable=None, avaliation_criteria=None
@@ -136,8 +138,9 @@ def extract_initiative(state: State, prompt_template=None, add_comportamentals=T
         return output
 
 
-@log_node
-@with_prompt()
+@decorators.log_node
+@decorators.with_prompt()
+@decorators.send_test_case()
 def find_initiative(state: State, prompt_template=None, add_comportamentals=True):
     threshold = 0.75
     initiative = state.get("initiative")
@@ -145,7 +148,7 @@ def find_initiative(state: State, prompt_template=None, add_comportamentals=True
     similar_initiatives = []
 
     if initiative:
-        found_initiatives = find_similar_embeddings(initiative)
+        found_initiatives = backend.find_similar_embeddings(initiative)
         for item in found_initiatives:
             if item.get("distance", 0) <= threshold:
                 similar_initiatives.append(item)
