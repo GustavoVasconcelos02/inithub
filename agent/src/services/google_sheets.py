@@ -42,9 +42,10 @@ def get_test_cases_sheet():
 
     sheet.freeze(rows=1)
 
-    _apply_text_wrap(
-        sheet, ["A:A", "B:B", "C:C", "D:D", "E:E", "F:F", "G:G", "H:H", "I:I"]
-    )
+    # Disable text wrapping for better readability
+    # _apply_text_wrap(
+    #     sheet, ["A:A", "B:B", "C:C", "D:D", "E:E", "F:F", "G:G", "H:H", "I:I"]
+    # )
 
     sheet.format(
         "A1:I1000",

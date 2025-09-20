@@ -68,14 +68,19 @@ def guide_v1(state: State, prompt_template=None, add_comportamentals=True):
 @decorators.with_prompt()
 @decorators.send_test_case()
 def register_initiative_v1(state: State, prompt_template=None):
-    new_initiative = state.get("initiative") or {}
+    initiative = state.get("initiative")
+
+    similar_initiatives = (
+        backend.find_similar_embeddings(initiative) if initiative else []
+    )
 
     prompt_content = (prompt_template or "").format(
-        TITLE=getattr(new_initiative, "title", "N/A"),
-        CONTEXT=getattr(new_initiative, "context", "N/A"),
-        THEME=getattr(new_initiative, "theme", "N/A"),
-        DELIVERABLE=getattr(new_initiative, "deliverable", "N/A"),
-        AVALIATION_CRITERIA=getattr(new_initiative, "avaliation_criteria", "N/A"),
+        TITLE=getattr(initiative, "title", "N/A"),
+        CONTEXT=getattr(initiative, "context", "N/A"),
+        THEME=getattr(initiative, "theme", "N/A"),
+        DELIVERABLE=getattr(initiative, "deliverable", "N/A"),
+        AVALIATION_CRITERIA=getattr(initiative, "avaliation_criteria", "N/A"),
+        SIMILAR_INITIATIVES=similar_initiatives,
     )
 
     result = {
@@ -87,7 +92,8 @@ def register_initiative_v1(state: State, prompt_template=None):
                     "content": prompt_content,
                 }
             ],
-        )
+        ),
+        "similar_initiatives": similar_initiatives,
     }
     return result
 
@@ -140,16 +146,11 @@ def extract_initiative_v1(state: State, prompt_template=None, add_comportamental
 @decorators.with_prompt()
 @decorators.send_test_case()
 def find_initiative_v1(state: State, prompt_template=None, add_comportamentals=True):
-    threshold = 0.75
     initiative = state.get("initiative")
 
-    similar_initiatives = []
-
-    if initiative:
-        found_initiatives = backend.find_similar_embeddings(initiative)
-        for item in found_initiatives:
-            if item.get("distance", 0) <= threshold:
-                similar_initiatives.append(item)
+    similar_initiatives = (
+        backend.find_similar_embeddings(initiative) if initiative else []
+    )
 
     prompt_content = (prompt_template or "").format(
         SIMILAR_INITIATIVES=similar_initiatives
@@ -166,7 +167,8 @@ def find_initiative_v1(state: State, prompt_template=None, add_comportamentals=T
                     "content": prompt_content,
                 }
             ],
-        )
+        ),
+        "similar_initiatives": similar_initiatives,
     }
 
     return result

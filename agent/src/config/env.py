@@ -20,6 +20,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 OPENAI_MODEL_NAME = os.getenv("OPENAI_MODEL_NAME", "gpt-4.1-2025-04-14")
 
 AGENT_MODEL_TEMPERATURE = float(os.getenv("AGENT_MODEL_TEMPERATURE", "0.3"))
+AGENT_EMBEDDING_THRESHOLD = float(os.getenv("AGENT_EMBEDDING_THRESHOLD", "0.75"))
 
 COLORLOG_AVAILABLE = os.getenv("COLORLOG_AVAILABLE", "true").lower() in (
     "true",

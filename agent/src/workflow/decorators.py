@@ -135,6 +135,12 @@ def send_test_case():
 
             if user_response and agent_response:
                 try:
+                    similar_initiatives = []
+                    if isinstance(result, dict):
+                        similar_initiatives = result.get("similar_initiatives", [])
+                    if not similar_initiatives:
+                        similar_initiatives = state.get("similar_initiatives", [])
+
                     sheet = get_test_cases_sheet()
                     test_case = {
                         "model": model_name,
@@ -145,7 +151,7 @@ def send_test_case():
                         "user_response": user_response,
                         "agent_response": agent_response,
                         "response_metadata": response_metadata,
-                        "retrieved_contexts": [],
+                        "retrieved_contexts": similar_initiatives,
                     }
 
                     add_test_case(sheet, TestCaseRow(**test_case))
