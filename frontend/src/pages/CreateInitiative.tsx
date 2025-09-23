@@ -1,11 +1,14 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import ConversationAgent from "@/components/features/chat/ChatMessages";
 import PreviewPanel from "@/components/features/chat/ChatInitiativePreview";
 import type { ChatInitiative } from "@/services/agent";
 import { initiativesService } from "@/services/initiatives";
+import { useAuth } from "@/hooks/useAuth";
+import { agentService } from "@/services/agent";
 import Modal from "@/ui/modal";
   
 const CreateInitiative = () => {
+    const { user } = useAuth();
     const [initiative, setInitiative] = useState<ChatInitiative | null>(null);
 
     const [modalOpen, setModalOpen] = useState(false);
@@ -14,6 +17,17 @@ const CreateInitiative = () => {
     const [onConfirmAction, setOnConfirmAction] = useState<(() => void) | undefined>(
         undefined
     );
+
+    useEffect(() => {
+        if (user?.id) {
+            agentService.setUser(user.id);
+            try {
+                agentService.reconnect();
+            } catch (error) {
+                console.error('Failed to connect to agent:', error);
+            }
+        }
+    }, [user?.id]);
 
     const openModal = (title?: string, message?: string, onConfirm?: () => void) => {
         setModalTitle(title);
