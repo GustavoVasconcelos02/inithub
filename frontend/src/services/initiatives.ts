@@ -1,5 +1,4 @@
 import api from "@/services/api";
-import { authService } from "@/services/auth";
 import type { Initiative } from "@/types/initiative";
 
 type GetInitiativesParams = {
@@ -34,22 +33,26 @@ class InitiativesService {
     }
   }
 
-  async getUserInitiatives(userId: string): Promise<Initiative[]> {
+  async getUserInitiatives(): Promise<Initiative[]> {
     try {
-      const response = await api.get<Initiative[]>(`/initiatives/user/${userId}/authored`);
+      // Trocamos a URL antiga pela rota correta do seu back-end
+      const response = await api.get<Initiative[]>(`/initiatives/me/authored`);
       return response.data;
     } catch (error) {
-      console.error(`Erro ao buscar iniciativas do usuário ${userId}:`, error);
+      // A mensagem de erro original estava ligeiramente errada, vamos remover o ID
+      console.error(`Erro ao buscar as iniciativas do usuário:`, error);
       throw error;
     }
   }
 
-  async getUserManagedInitiatives(userId: string): Promise<Initiative[]> {
+  async getUserManagedInitiatives(): Promise<Initiative[]> {
     try {
-      const response = await api.get<Initiative[]>(`/initiatives/user/${userId}/assigned`);
+      // Trocamos a URL antiga pela rota correta do seu back-end
+      const response = await api.get<Initiative[]>(`/initiatives/me/assigned`);
       return response.data;
     } catch (error) {
-      console.error(`Erro ao buscar iniciativas gerenciadas pelo usuário ${userId}:`, error);
+      // A mensagem de erro original estava ligeiramente errada, vamos remover o ID
+      console.error(`Erro ao buscar as iniciativas gerenciadas pelo usuário:`, error);
       throw error;
     }
   }
@@ -141,25 +144,15 @@ class InitiativesService {
     }
   }
 
-  async approveInitiative(initiativeId: string, assignedToId: string) {
-    const localAdmin = authService.getUserFromLocalStorage();
-    if (!localAdmin?.id) {
-      throw new Error('Sessão inválida. Faça login novamente.');
-    }
+  async approveInitiative(initiativeId: string, assignedToId: string, assignedById: string) {
+    // O ID do aprovador (assignedById) agora vem como parâmetro
+    if (!assignedById) throw new Error('ID do aprovador não fornecido.');
 
-    let assignedById = localAdmin.id;
-    try {
-      const authUser = await authService.getUserForAuth(localAdmin.id);
-      if (authUser?.id) assignedById = authUser.id;
-    } catch (e) {
-      try {
-        const loginResp = await authService.login(localAdmin.email);
-        if (loginResp?.user?.id) assignedById = loginResp.user.id;
-      } catch {
-        // keep fallback to localAdmin.id
-      }
-    }
-    return this.changeInitiativeStatus(initiativeId, 'execution', { assignedToId, assignedById });
+    return this.changeInitiativeStatus(
+      initiativeId,
+      'execution',
+      { assignedToId, assignedById }
+    );
   }
 
   async rejectInitiative(initiativeId: string) {
@@ -188,31 +181,31 @@ class InitiativesService {
     }
   }
 
-  async createInitiative(payload: {
-    title: string;
-    description: string;
-    theme: string;
-    context: string;
-    deliverable: string;
-    evaluationCriteria: string;
-    authorId?: string;
-  }) {
-    const localUser = authService.getUserFromLocalStorage();
-    if (!localUser?.id && !payload.authorId) {
+  async createInitiative(
+    // O payload agora contém apenas os dados da iniciativa
+    payload: {
+      title: string;
+      description: string;
+      theme: string;
+      context: string;
+      deliverable: string;
+      evaluationCriteria: string;
+    }, 
+    // O authorId é um parâmetro separado e obrigatório
+    authorId: string
+  ) {
+    // 1. Verificação de segurança: garante que o ID do autor foi fornecido pelo componente
+    if (!authorId) {
       throw new Error('Sessão inválida. Faça login para publicar a ideia.');
     }
 
+    // 2. Monta o corpo da requisição, agora de forma mais segura e direta
     const body = {
-      title: payload.title,
-      description: payload.description,
-      theme: payload.theme,
-      context: payload.context,
-      deliverable: payload.deliverable,
-      evaluationCriteria: payload.evaluationCriteria,
-      authorId: payload.authorId ?? localUser!.id,
+      ...payload, // Adiciona todos os campos do payload (title, description, etc.)
+      authorId: authorId, // Adiciona o ID do autor que veio como parâmetro
     };
 
-    // Simple client-side validation mirroring backend DTO requirements
+    // 3. Sua validação de campos vazios (continua igual e funcional)
     const missing = Object.entries(body)
       .filter(([, v]) => typeof v === 'string' && !String(v).trim())
       .map(([k]) => k);
@@ -220,9 +213,10 @@ class InitiativesService {
       throw new Error(`Preencha todos os campos obrigatórios: ${missing.join(', ')}`);
     }
 
+    // 4. A chamada à API permanece a mesma
     try {
       const response = await api.post('/initiatives', body);
-      return response.data as Initiative;
+      return response.data as Initiative; // Supondo que você tenha o tipo Initiative
     } catch (error) {
       console.error('Erro ao criar iniciativa:', error);
       throw error;

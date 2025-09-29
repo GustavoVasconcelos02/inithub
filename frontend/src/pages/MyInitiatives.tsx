@@ -1,28 +1,31 @@
 import { useEffect, useState } from 'react';
 import InitiativeCard from '@/components/features/initiatives/InitiativeCard';
 import { initiativesService } from '@/services/initiatives';
-import { authService } from '@/services/auth';
+// import { authService } from '@/services/auth'; // <-- 1. REMOVIDO
+import { useAuth } from '@/hooks/useAuth'; // <-- 2. ADICIONADO
 import type { Initiative } from '@/types/initiative';
 
 const MyInitiatives = () => {
     const [initiatives, setInitiatives] = useState<Initiative[]>([]);
     const [managedInitiatives, setManagedInitiatives] = useState<Initiative[]>([]);
     const [loading, setLoading] = useState(true);
+    const { user } = useAuth(); // <-- 3. USANDO O HOOK PARA PEGAR O USUÁRIO
 
     useEffect(() => {
+        // A função agora depende do objeto 'user' para rodar
         const fetchInitiatives = async () => {
-            try {
-                const user = authService.getUserFromLocalStorage();
-                if (!user) {
-                    console.error('Usuário não encontrado no localStorage');
-                    setLoading(false);
-                    return;
-                }
+            // Se não houver usuário logado, não faz nada
+            if (!user) {
+                setLoading(false);
+                return;
+            }
 
-                const userInitiatives = await initiativesService.getUserInitiatives(user.id);
+            try {
+                // Usa o user.id do nosso contexto para buscar as iniciativas
+                const userInitiatives = await initiativesService.getUserInitiatives();
                 setInitiatives(userInitiatives);
 
-                const managed = await initiativesService.getUserManagedInitiatives(user.id);
+                const managed = await initiativesService.getUserManagedInitiatives();
                 setManagedInitiatives(managed);
             } catch (error) {
                 console.error('Erro ao buscar iniciativas:', error);
@@ -31,8 +34,15 @@ const MyInitiatives = () => {
             }
         };
 
-        fetchInitiatives();
-    }, []);
+        // Roda a função apenas se o estado de loading do AuthProvider já terminou e temos um usuário
+        if (user) {
+          fetchInitiatives();
+        } else {
+          // Se não houver usuário após o carregamento inicial, podemos parar o loading
+          setLoading(false);
+        }
+
+    }, [user]); // <-- 4. O useEffect agora depende do 'user'
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -45,6 +55,7 @@ const MyInitiatives = () => {
                     <>
                         <div className="mb-12">
                             <h4 className="font-semibold text-gray-900 mb-2 text-sm lg:text-base">Minhas Iniciativas</h4>
+                            {/* O resto do seu JSX permanece o mesmo */}
                             {initiatives.length === 0 ? (
                                 <p className="text-gray-600 text-center">Nenhuma proposta foi cadastrada por você até o momento. Para começar, crie uma nova iniciativa.</p>
                             ) : (

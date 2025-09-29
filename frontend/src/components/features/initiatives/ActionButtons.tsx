@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Heart, MessageCircle, Share2, Settings } from "lucide-react";
 import { initiativesService } from "@/services/initiatives";
-import { authService } from "@/services/auth";
+// import { authService } from "@/services/auth"; // <-- 1. REMOVIDO
+import { useAuth } from "@/hooks/useAuth"; // <-- 2. ADICIONADO
 import { getLikeButtonStyles } from "@/utils/functions/functionsInitiative";
 import type { Initiative } from "@/types/initiative";
 
@@ -14,15 +15,20 @@ interface ActionButtonsProps {
 
 const ActionButtons = ({ initiative, onToggleComments, isManaged = false }: ActionButtonsProps) => {
   const navigate = useNavigate();
-  const user = authService.getUserFromLocalStorage();
-  const userId = user ? user.id : "xxxx-xxxx-xxxx";
+  const { user } = useAuth(); // <-- 3. USANDO O HOOK
+  
+  // O ID do usuário agora vem de forma segura do nosso contexto
+  const userId = user ? user.id : null;
 
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(initiative.likes.length ?? 0);
 
   useEffect(() => {
-    const isLiked = initiative.likes.some(l => l.userId === userId);
-    setLiked(isLiked);
+    // A lógica para verificar se o post foi curtido permanece a mesma
+    if (userId) {
+      const isLiked = initiative.likes.some(l => l.userId === userId);
+      setLiked(isLiked);
+    }
     setLikesCount(initiative.likes.length ?? 0);
   }, [initiative.likes, userId]);
 
@@ -31,6 +37,13 @@ const ActionButtons = ({ initiative, onToggleComments, isManaged = false }: Acti
   };
 
   const handleLikeClick = () => {
+    // Garante que apenas usuários logados possam curtir
+    if (!userId) {
+      alert("Você precisa estar logado para curtir uma iniciativa.");
+      return;
+    }
+
+    // A lógica otimista de like/unlike permanece a mesma
     if (liked) {
       setLiked(false);
       setLikesCount(c => Math.max(0, c - 1));
@@ -52,47 +65,48 @@ const ActionButtons = ({ initiative, onToggleComments, isManaged = false }: Acti
 
   return (
     <div className="px-6 py-3 bg-gray-50 flex items-center justify-between">
-      <div className="flex items-center space-x-6">
-        <button
-          className={getLikeButtonStyles(liked)}
-          onClick={handleLikeClick}
-        >
-          <Heart className={`w-5 h-5 ${liked ? 'fill-current' : ''}`} />
-          <span className="text-sm">{likesCount}</span>
-        </button>
+        {/* O resto do seu JSX permanece o mesmo */}
+        <div className="flex items-center space-x-6">
+            <button
+                className={getLikeButtonStyles(liked)}
+                onClick={handleLikeClick}
+            >
+                <Heart className={`w-5 h-5 ${liked ? 'fill-current' : ''}`} />
+                <span className="text-sm">{likesCount}</span>
+            </button>
 
-        <button 
-          onClick={onToggleComments}
-          className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors"
-        >
-          <MessageCircle className="w-5 h-5" />
-          <span className="text-sm">{initiative.comments.length}</span>
-        </button>
+            <button 
+                onClick={onToggleComments}
+                className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 transition-colors"
+            >
+                <MessageCircle className="w-5 h-5" />
+                <span className="text-sm">{initiative.comments.length}</span>
+            </button>
 
-        <button className="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors">
-          <Share2 className="w-5 h-5" />
-          <span className="text-sm hidden md:inline">Compartilhar</span>
-        </button>
-      </div>
+            <button className="flex items-center space-x-2 text-gray-600 hover:text-green-600 transition-colors">
+                <Share2 className="w-5 h-5" />
+                <span className="text-sm hidden md:inline">Compartilhar</span>
+            </button>
+        </div>
 
-      {initiative.status === "IN_EXECUTION" && (
-        <button 
-          className="flex items-center space-x-2 text-purple-600 hover:text-purple-800 font-medium text-sm transition-colors"
-          onClick={handleProgressClick}
-        >
-          {isManaged ? (
-            <>
-              <span>Gerenciar</span>
-              <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
-            </>
-          ) : (
-            <>
-              <span>Progresso</span>
-              <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
-            </>
-          )}
-        </button>
-      )}
+        {initiative.status === "IN_EXECUTION" && (
+            <button 
+                className="flex items-center space-x-2 text-purple-600 hover:text-purple-800 font-medium text-sm transition-colors"
+                onClick={handleProgressClick}
+            >
+                {isManaged ? (
+                    <>
+                        <span>Gerenciar</span>
+                        <Settings className="w-3 h-3 sm:w-4 sm:h-4" />
+                    </>
+                ) : (
+                    <>
+                        <span>Progresso</span>
+                        <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
+                    </>
+                )}
+            </button>
+        )}
     </div>
   );
 };

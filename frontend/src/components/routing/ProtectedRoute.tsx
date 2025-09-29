@@ -19,10 +19,13 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     );
   }
 
+  // A ÚNICA MUDANÇA REALMENTE NECESSÁRIA ESTÁ AQUI:
+  // Se não estiver autenticado, redirecione DIRETAMENTE para a página de login.
   if (!isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
+  // Se estiver autenticado, renderize o conteúdo protegido (os children).
   return <>{children}</>;
 };
 

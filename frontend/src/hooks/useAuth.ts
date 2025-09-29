@@ -1,37 +1,29 @@
-import { useState, useEffect } from 'react';
-import { authService } from '@/services/auth';
-import type { User } from '@/services/auth';
+import { createContext, useContext } from 'react';
+import type { User } from '../types/user'; // Ajuste o caminho se necessário
 
+// 1. Definindo o "contrato": O que o nosso contexto de autenticação vai oferecer?
+export interface AuthContextType {
+  user: User | null;
+  isAuthenticated: boolean;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+}
+
+// 2. Criando o Contexto com um valor padrão
+// O valor padrão é 'undefined' para nos ajudar a garantir que o hook 
+// só seja usado dentro do Provedor.
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// 3. Criando o Hook personalizado
+// Este é o hook que os componentes irão usar para acessar a autenticação.
 export const useAuth = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
+  const context = useContext(AuthContext);
 
-  useEffect(() => {
-    const authenticated = authService.isAuthenticated();
-    const userData = authService.getUserFromLocalStorage();
+  // Se um componente tentar usar o hook fora do Provedor, receberemos um erro claro.
+  if (context === undefined) {
+    throw new Error('useAuth deve ser usado dentro de um AuthProvider');
+  }
 
-    setIsAuthenticated(authenticated);
-    setUser(userData);
-    setLoading(false);
-  }, []);
-
-  const logout = () => {
-    authService.logout();
-    setUser(null);
-    setIsAuthenticated(false);
-  };
-
-  const updateUser = (userData: User) => {
-    setUser(userData);
-    setIsAuthenticated(true);
-  };
-
-  return {
-    user,
-    isAuthenticated,
-    loading,
-    logout,
-    updateUser
-  };
+  return context;
 };
