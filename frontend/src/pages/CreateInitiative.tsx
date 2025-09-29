@@ -1,10 +1,11 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect } from "react";
 import ConversationAgent from "@/components/features/chat/ChatMessages";
-import PreviewPanel from "@/components/features/chat/ChatInitiativePreview"; // Este é o seu ChatInitiativePreview.tsx
+import PreviewPanel from "@/components/features/chat/ChatInitiativePreview"; 
 import type { ChatInitiative } from "@/services/agent";
 import { initiativesService } from "@/services/initiatives";
+import { agentService } from "@/services/agent";
 import Modal from "@/ui/modal";
-import { useAuth } from "@/hooks/useAuth"; // <-- PONTO CHAVE 1: Importar o useAuth
+import { useAuth } from "@/hooks/useAuth"; 
 
 const CreateInitiative = () => {
     const [initiative, setInitiative] = useState<ChatInitiative | null>(null);
