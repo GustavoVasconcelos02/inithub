@@ -63,7 +63,6 @@ export class InitiativesController {
     return this.initiativesService.remove(id, userId);
   }
 
-  // Likes
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Post(':id/like')
@@ -82,7 +81,6 @@ export class InitiativesController {
     return this.initiativesService.removeLike(initiativeId, userId);
   }
 
-  // Comentários
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Post(':id/comments')

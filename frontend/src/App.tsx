@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom"; // Removido 'BrowserRouter as Router'
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Login from "@/pages/Login";
 import CreateInitiative from "@/pages/CreateInitiative";

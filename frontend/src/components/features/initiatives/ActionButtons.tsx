@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Heart, MessageCircle, Share2, Settings } from "lucide-react";
 import { initiativesService } from "@/services/initiatives";
-// import { authService } from "@/services/auth"; // <-- 1. REMOVIDO
-import { useAuth } from "@/hooks/useAuth"; // <-- 2. ADICIONADO
+import { useAuth } from "@/hooks/useAuth"; 
 import { getLikeButtonStyles } from "@/utils/functions/functionsInitiative";
 import type { Initiative } from "@/types/initiative";
 
@@ -15,16 +14,14 @@ interface ActionButtonsProps {
 
 const ActionButtons = ({ initiative, onToggleComments, isManaged = false }: ActionButtonsProps) => {
   const navigate = useNavigate();
-  const { user } = useAuth(); // <-- 3. USANDO O HOOK
+  const { user } = useAuth(); 
   
-  // O ID do usuário agora vem de forma segura do nosso contexto
   const userId = user ? user.id : null;
 
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(initiative.likes.length ?? 0);
 
   useEffect(() => {
-    // A lógica para verificar se o post foi curtido permanece a mesma
     if (userId) {
       const isLiked = initiative.likes.some(l => l.userId === userId);
       setLiked(isLiked);
@@ -43,7 +40,6 @@ const ActionButtons = ({ initiative, onToggleComments, isManaged = false }: Acti
       return;
     }
 
-    // A lógica otimista de like/unlike permanece a mesma
     if (liked) {
       setLiked(false);
       setLikesCount(c => Math.max(0, c - 1));
@@ -65,7 +61,6 @@ const ActionButtons = ({ initiative, onToggleComments, isManaged = false }: Acti
 
   return (
     <div className="px-6 py-3 bg-gray-50 flex items-center justify-between">
-        {/* O resto do seu JSX permanece o mesmo */}
         <div className="flex items-center space-x-6">
             <button
                 className={getLikeButtonStyles(liked)}
