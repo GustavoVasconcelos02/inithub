@@ -4,9 +4,8 @@ import { Label } from '@/ui/label';
 import { Button } from '@/ui/button';
 import { authService } from '@/services/auth';
 import type {CreateUserDto } from '@/services/auth';
-import { useState } from 'react'; // Apenas para o 'confirmPassword'
+import { useState } from 'react'; 
 
-// --- 1. ATUALIZAÇÃO: DEFININDO OS PROPS QUE O COMPONENTE RECEBE ---
 interface CreateAccountFormStep2Props {
   onBack: () => void;
   formData: Partial<CreateUserDto>;
@@ -15,11 +14,9 @@ interface CreateAccountFormStep2Props {
 
 const CreateAccountFormStep2 = ({ onBack, formData, handleChange }: CreateAccountFormStep2Props) => {
   const navigate = useNavigate();
-  // Mantemos um estado local apenas para a confirmação da senha,
-  // pois ela não precisa ser guardada no estado global.
+
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  // --- 2. MODIFICAÇÃO: A FUNÇÃO handleSubmit AGORA USA O formData DO PAI ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -28,14 +25,12 @@ const CreateAccountFormStep2 = ({ onBack, formData, handleChange }: CreateAccoun
       return;
     }
 
-    // Valida se todos os dados necessários (dos dois passos) estão presentes
     if (!formData.name || !formData.department || !formData.email || !formData.password) {
       alert('Parece que alguns dados do passo anterior se perderam. Por favor, volte e verifique.');
       return;
     }
 
     try {
-      // Agora o 'formData' contém os dados de AMBOS os passos!
       await authService.register(formData as CreateUserDto);
 
       alert('Conta criada com sucesso! Você será redirecionado para o login.');
@@ -57,12 +52,11 @@ const CreateAccountFormStep2 = ({ onBack, formData, handleChange }: CreateAccoun
           </p>
         </div>
 
-        {/* --- 3. MODIFICAÇÃO: CONECTANDO OS INPUTS AOS PROPS --- */}
         <div className="grid gap-2">
           <Label htmlFor="email">Email Corporativo</Label>
           <Input
             className="bg-transparent"
-            id="email" // O id corresponde à chave no formData
+            id="email" 
             type="email"
             placeholder="admin@inithub.com"
             required
@@ -75,7 +69,7 @@ const CreateAccountFormStep2 = ({ onBack, formData, handleChange }: CreateAccoun
           <Label htmlFor="password">Senha</Label>
           <Input
             className="bg-transparent"
-            id="password" // O id corresponde à chave no formData
+            id="password" 
             type="password"
             placeholder="Digite sua senha"
             required

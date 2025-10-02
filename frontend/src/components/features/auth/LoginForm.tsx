@@ -3,39 +3,32 @@ import { useState } from "react";
 import { Button } from "@/ui/button";
 import { Input } from "@/ui/input";
 import { Label } from "@/ui/label";
-import { useAuth } from "@/hooks/useAuth"; // <-- 1. IMPORTAR O useAuth
+import { useAuth } from "@/hooks/useAuth"; 
 
 const LoginForm = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [isLoading, setIsLoading] = useState(false); // <-- 2. ESTADO DE LOADING
-    const [error, setError] = useState<string | null>(null); // <-- 3. ESTADO DE ERRO
+    const [isLoading, setIsLoading] = useState(false); 
+    const [error, setError] = useState<string | null>(null); 
 
-    // 4. USAR A FUNÇÃO DE LOGIN DO NOSSO CONTEXTO
     const { login } = useAuth();
 
-    // O useEffect antigo não é mais necessário, pois o AuthContext gerencia o usuário.
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsLoading(true); // Inicia o loading
-        setError(null);     // Limpa erros antigos
+        setIsLoading(true); 
+        setError(null);     
 
         try {
-            // 5. CHAMA A FUNÇÃO DE LOGIN GLOBAL
-            // A lógica de salvar token e redirecionar já está dentro dela!
             await login(email, password);
 
-            // Se o login for bem-sucedido, o AuthProvider já nos redirecionará.
-            // O código aqui só é executado em caso de sucesso.
             
         } catch (err) {
-            // 6. TRATAMENTO DE ERRO PARA O USUÁRIO
             console.error('Erro no login:', err);
             setError("Email ou senha inválidos. Tente novamente.");
         } finally {
-            setIsLoading(false); // Finaliza o loading
+            setIsLoading(false); 
         }
     };
 
@@ -79,14 +72,13 @@ const LoginForm = () => {
                     />
                 </div>
 
-                {/* 7. MOSTRAR MENSAGEM DE ERRO NA TELA */}
                 {error && <p className="text-sm font-medium text-red-500">{error}</p>}
 
                 <div className="grid gap-3">
                     <Button 
                         type="submit" 
                         className="w-full shadow-md"
-                        disabled={isLoading} // <-- 8. DESABILITAR BOTÃO DURANTE O LOADING
+                        disabled={isLoading}
                     >
                         {isLoading ? 'Entrando...' : 'Entrar'}
                     </Button>

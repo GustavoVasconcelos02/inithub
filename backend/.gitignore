@@ -29,6 +29,3 @@ coverage/
 # OS
 .DS_Store
 Thumbs.db
-
-/backend/package.json
-/backend/package-lock.json
