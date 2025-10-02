@@ -48,7 +48,6 @@ function LoginRoute() {
 // Componente principal da aplicação
 export default function App() {
   return (
-    // O <Router> foi removido daqui. O componente agora retorna <Routes> diretamente.
     <Routes>
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="/login" element={<LoginRoute />} />

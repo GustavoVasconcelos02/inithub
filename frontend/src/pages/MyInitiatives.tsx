@@ -9,19 +9,16 @@ const MyInitiatives = () => {
     const [initiatives, setInitiatives] = useState<Initiative[]>([]);
     const [managedInitiatives, setManagedInitiatives] = useState<Initiative[]>([]);
     const [loading, setLoading] = useState(true);
-    const { user } = useAuth(); // <-- 3. USANDO O HOOK PARA PEGAR O USUÁRIO
+    const { user } = useAuth();
 
     useEffect(() => {
-        // A função agora depende do objeto 'user' para rodar
         const fetchInitiatives = async () => {
-            // Se não houver usuário logado, não faz nada
             if (!user) {
                 setLoading(false);
                 return;
             }
 
             try {
-                // Usa o user.id do nosso contexto para buscar as iniciativas
                 const userInitiatives = await initiativesService.getUserInitiatives();
                 setInitiatives(userInitiatives);
 
@@ -33,16 +30,13 @@ const MyInitiatives = () => {
                 setLoading(false);
             }
         };
-
-        // Roda a função apenas se o estado de loading do AuthProvider já terminou e temos um usuário
         if (user) {
           fetchInitiatives();
         } else {
-          // Se não houver usuário após o carregamento inicial, podemos parar o loading
           setLoading(false);
         }
 
-    }, [user]); // <-- 4. O useEffect agora depende do 'user'
+    }, [user]);
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -55,7 +49,6 @@ const MyInitiatives = () => {
                     <>
                         <div className="mb-12">
                             <h4 className="font-semibold text-gray-900 mb-2 text-sm lg:text-base">Minhas Iniciativas</h4>
-                            {/* O resto do seu JSX permanece o mesmo */}
                             {initiatives.length === 0 ? (
                                 <p className="text-gray-600 text-center">Nenhuma proposta foi cadastrada por você até o momento. Para começar, crie uma nova iniciativa.</p>
                             ) : (
